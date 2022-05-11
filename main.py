@@ -243,11 +243,11 @@ def accuracy(output, target, topk=(1,)):
 
     _, pred = output.topk(maxk, 1, True, True)
     pred = pred.t()
-    correct = pred.eq(target.view(1, -1).expand_as(pred))
+    correct = pred.eq(target.reshape(1, -1).expand_as(pred))
 
     res = []
     for k in topk:
-        correct_k = correct[:k].view(-1).float().sum(0)
+        correct_k = correct[:k].reshape(-1).float().sum(0)
         res.append(correct_k.mul_(100.0 / batch_size))
     return res
 
@@ -331,13 +331,17 @@ class EarlyBird():
 
         mask = torch.zeros(total)
         index = 0
+        log_file_name = "channel_log_" + str(int(percent*100)) + ".txt"
+        
         for k, m in enumerate(model.modules()):
             if isinstance(m, nn.BatchNorm2d):
                 size = m.weight.data.numel()
                 weight_copy = m.weight.data.abs().clone()
                 _mask = weight_copy.gt(thre.cuda()).float().cuda()
-                mask[index:(index+size)] = _mask.view(-1)
-                # print('layer index: {:d} \t total channel: {:d} \t remaining channel: {:d}'.format(k, _mask.shape[0], int(torch.sum(_mask))))
+                mask[index:(index+size)] = _mask.reshape(-1)
+                # Appending to log file
+                with open(log_file_name, 'a') as file1:
+                  file1.write('layer index: {:d} \t total channel: {:d} \t remaining channel: {:d}\n'.format(k, _mask.shape[0], int(torch.sum(_mask))))
                 index += size
 
         # print('Pre-processing Successful!')
@@ -381,6 +385,14 @@ early_bird_30 = EarlyBird(0.3)
 early_bird_50 = EarlyBird(0.5)
 early_bird_70 = EarlyBird(0.7)
 for epoch in range(args.start_epoch, args.epochs):
+  
+    with open("channel_log_30.txt", 'a') as file1:
+        file1.write('\nEpoch: {:d}\n\n'.format(epoch))
+    with open("channel_log_50.txt", 'a') as file1:
+        file1.write('\nEpoch: {:d}\n\n'.format(epoch))
+    with open("channel_log_70.txt", 'a') as file1:
+        file1.write('\nEpoch: {:d}\n\n'.format(epoch))
+    
     if early_bird_30.early_bird_emerge(model):
         print("[early_bird_30] Find EB!!!!!!!!!, epoch: "+str(epoch))
         if flag_30:

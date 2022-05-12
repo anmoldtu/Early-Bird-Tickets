@@ -332,6 +332,7 @@ class EarlyBird():
         mask = torch.zeros(total)
         index = 0
         log_file_name = "channel_log_" + str(int(percent*100)) + ".txt"
+        log_file_path = os.path.join(args.save, log_file_name)
         
         for k, m in enumerate(model.modules()):
             if isinstance(m, nn.BatchNorm2d):
@@ -340,7 +341,7 @@ class EarlyBird():
                 _mask = weight_copy.gt(thre.cuda()).float().cuda()
                 mask[index:(index+size)] = _mask.reshape(-1)
                 # Appending to log file
-                with open(log_file_name, 'a') as file1:
+                with open(log_file_path, 'a') as file1:
                   file1.write('layer index: {:d} \t total channel: {:d} \t remaining channel: {:d}\n'.format(k, _mask.shape[0], int(torch.sum(_mask))))
                 index += size
 
@@ -385,12 +386,12 @@ early_bird_30 = EarlyBird(0.3)
 early_bird_50 = EarlyBird(0.5)
 early_bird_70 = EarlyBird(0.7)
 for epoch in range(args.start_epoch, args.epochs):
-  
-    with open("channel_log_30.txt", 'a') as file1:
+    
+    with open(os.path.join(args.save, 'channel_log_30.txt'), 'a') as file1:
         file1.write('\nEpoch: {:d}\n\n'.format(epoch))
-    with open("channel_log_50.txt", 'a') as file1:
+    with open(os.path.join(args.save, 'channel_log_50.txt'), 'a') as file1:
         file1.write('\nEpoch: {:d}\n\n'.format(epoch))
-    with open("channel_log_70.txt", 'a') as file1:
+    with open(os.path.join(args.save, 'channel_log_70.txt'), 'a') as file1:
         file1.write('\nEpoch: {:d}\n\n'.format(epoch))
     
     if early_bird_30.early_bird_emerge(model):

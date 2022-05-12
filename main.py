@@ -9,6 +9,7 @@ import torch.nn.functional as F
 import torch.optim as optim
 from torchvision import datasets, transforms
 from torch.autograd import Variable
+import matplotlib as plt
 
 import models
 from filter import *
@@ -356,6 +357,10 @@ class EarlyBird():
             self.masks.append(mask)
 
     def cal_dist(self):
+        if(len(self.masks) >= 2):
+          cur_mask = self.masks[-1]
+          last_mask = self.masks[len(self.masks) - 2]
+          self.maskdiff.append(torch.sum(cur_mask!=last_mask))
         if len(self.masks) == self.epoch_keep:
             for i in range(len(self.masks)-1):
                 mask_i = self.masks[-1]
@@ -377,11 +382,17 @@ class EarlyBird():
             return True
         else:
             return False
+          
+    def get_maskdiff(self):
+        return self.maskdiff
 
 best_prec1 = 0.
 flag_30 = True
 flag_50 = True
 flag_70 = True
+epoch_30 = -1
+epoch_50 = -1
+epoch_70 = -1
 early_bird_30 = EarlyBird(0.3)
 early_bird_50 = EarlyBird(0.5)
 early_bird_70 = EarlyBird(0.7)
@@ -396,6 +407,8 @@ for epoch in range(args.start_epoch, args.epochs):
     
     if early_bird_30.early_bird_emerge(model):
         print("[early_bird_30] Find EB!!!!!!!!!, epoch: "+str(epoch))
+        if epoch_30 == -1:
+          epoch_30 = epoch
         if flag_30:
             save_checkpoint({
             'epoch': epoch + 1,
@@ -405,6 +418,8 @@ for epoch in range(args.start_epoch, args.epochs):
             }, is_best, 'EB-30-'+str(epoch+1), filepath=args.save)
             flag_30 = False
     if early_bird_50.early_bird_emerge(model):
+        if epoch_50 == -1:
+          epoch_50 = epoch
         print("[early_bird_50] Find EB!!!!!!!!!, epoch: "+str(epoch))
         if flag_50:
             save_checkpoint({
@@ -415,6 +430,8 @@ for epoch in range(args.start_epoch, args.epochs):
             }, is_best, 'EB-50-'+str(epoch+1), filepath=args.save)
             flag_50 = False
     if early_bird_70.early_bird_emerge(model):
+        if epoch_70 == -1:
+          epoch_70 = epoch
         print("[early_bird_70] Find EB!!!!!!!!!, epoch: "+str(epoch))
         if flag_70:
             save_checkpoint({
@@ -439,6 +456,8 @@ for epoch in range(args.start_epoch, args.epochs):
         'best_prec1': best_prec1,
         'optimizer': optimizer.state_dict(),
     }, is_best, epoch, filepath=args.save)
+
+all_epochs = [*range(2, args.epochs, 1)]
 
 print("Best accuracy: "+str(best_prec1))
 history_score[-1][0] = best_prec1

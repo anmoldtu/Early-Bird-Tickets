@@ -310,6 +310,7 @@ class EarlyBird():
         self.epoch_keep = epoch_keep
         self.masks = []
         self.dists = [1 for i in range(1, self.epoch_keep)]
+        self.maskdiff = []
 
     def pruning(self, model, percent):
         total = 0
@@ -458,6 +459,18 @@ for epoch in range(args.start_epoch, args.epochs):
     }, is_best, epoch, filepath=args.save)
 
 all_epochs = [*range(2, args.epochs, 1)]
+
+plt.figure()
+plt.plot( all_epochs, early_bird_30.get_maskdiff() );
+plt.savefig(os.path.join(args.save, 'EB30.png'))
+
+plt.figure()
+plt.plot( all_epochs, early_bird_50.get_maskdiff() );
+plt.savefig(os.path.join(args.save, 'EB50.png'))
+
+plt.figure()
+plt.plot( all_epochs, early_bird_70.get_maskdiff() );
+plt.savefig(os.path.join(args.save, 'EB70.png'))
 
 print("Best accuracy: "+str(best_prec1))
 history_score[-1][0] = best_prec1

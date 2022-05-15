@@ -458,7 +458,7 @@ for epoch in range(args.start_epoch, args.epochs):
         'optimizer': optimizer.state_dict(),
     }, is_best, epoch, filepath=args.save)
 
-all_epochs = [*range(2, args.epochs, 1)]
+all_epochs = [*range(1, args.epochs, 1)]
 
 plt.figure()
 plt.plot( all_epochs, early_bird_30.get_maskdiff() );

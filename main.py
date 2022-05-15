@@ -461,15 +461,15 @@ for epoch in range(args.start_epoch, args.epochs):
 all_epochs = [*range(1, args.epochs, 1)]
 
 plt.figure()
-plt.plot( all_epochs, early_bird_30.get_maskdiff() );
+plt.plot( all_epochs, early_bird_30.get_maskdiff(), linestyle='solid', marker='o' )
 plt.savefig(os.path.join(args.save, 'EB30.png'))
 
 plt.figure()
-plt.plot( all_epochs, early_bird_50.get_maskdiff() );
+plt.plot( all_epochs, early_bird_50.get_maskdiff(), linestyle='solid', marker='o' )
 plt.savefig(os.path.join(args.save, 'EB50.png'))
 
 plt.figure()
-plt.plot( all_epochs, early_bird_70.get_maskdiff() );
+plt.plot( all_epochs, early_bird_70.get_maskdiff(), linestyle='solid', marker='o' )
 plt.savefig(os.path.join(args.save, 'EB70.png'))
 
 print("Best accuracy: "+str(best_prec1))

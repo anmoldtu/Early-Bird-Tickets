@@ -9,7 +9,7 @@ import torch.nn.functional as F
 import torch.optim as optim
 from torchvision import datasets, transforms
 from torch.autograd import Variable
-import matplotlib as plt
+import matplotlib.pyplot as plt
 
 import models
 from filter import *
@@ -461,19 +461,19 @@ for epoch in range(args.start_epoch, args.epochs):
 all_epochs = [*range(1, args.epochs, 1)]
 
 plt.figure()
-plt.plot( all_epochs[0:epoch_30], early_bird_30.get_maskdiff()[0:epoch_30], 'b-' )
+plt.plot( all_epochs[0:epoch_30+1], early_bird_30.get_maskdiff()[0:epoch_30+1], 'b-' )
 plt.plot( all_epochs[epoch_30], early_bird_30.get_maskdiff()[epoch_30], 'g*-' )
 plt.plot( all_epochs[epoch_30:], early_bird_30.get_maskdiff()[epoch_30:], 'b-' )
 plt.savefig(os.path.join(args.save, 'EB30.png'))
 
 plt.figure()
-plt.plot( all_epochs[0:epoch_50], early_bird_50.get_maskdiff()[0:epoch_50], 'b-' )
+plt.plot( all_epochs[0:epoch_50+1], early_bird_50.get_maskdiff()[0:epoch_50+1], 'b-' )
 plt.plot( all_epochs[epoch_50], early_bird_50.get_maskdiff()[epoch_50], 'g*-' )
 plt.plot( all_epochs[epoch_50:], early_bird_50.get_maskdiff()[epoch_50:], 'b-' )
 plt.savefig(os.path.join(args.save, 'EB50.png'))
 
 plt.figure()
-plt.plot( all_epochs[0:epoch_70], early_bird_70.get_maskdiff()[0:epoch_70], 'b-' )
+plt.plot( all_epochs[0:epoch_70+1], early_bird_70.get_maskdiff()[0:epoch_70+1], 'b-' )
 plt.plot( all_epochs[epoch_70], early_bird_70.get_maskdiff()[epoch_70], 'g*-' )
 plt.plot( all_epochs[epoch_70:], early_bird_70.get_maskdiff()[epoch_70:], 'b-' )
 plt.savefig(os.path.join(args.save, 'EB70.png'))

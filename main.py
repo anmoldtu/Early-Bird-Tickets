@@ -464,21 +464,27 @@ plt.figure()
 plt.plot( all_epochs, early_bird_30.get_maskdiff(), 'b-' )
 plt.xlabel('Epochs')
 plt.ylabel('Number of Changes in Pruning Mask')
-plt.plot( all_epochs[epoch_30], early_bird_30.get_maskdiff()[epoch_30], 'r*-', markersize=18 )
+title = args.dataset + '-' + args.arch + ': p=0.3'
+plt.title(title)
+plt.plot( all_epochs[epoch_30], early_bird_30.get_maskdiff()[epoch_30], 'r*-', markersize=13 )
 plt.savefig(os.path.join(args.save, 'EB30.png'))
 
 plt.figure()
 plt.plot( all_epochs, early_bird_50.get_maskdiff(), 'b-' )
 plt.xlabel('Epochs')
 plt.ylabel('Number of Changes in Pruning Mask')
-plt.plot( all_epochs[epoch_50], early_bird_50.get_maskdiff()[epoch_50], 'r*-', markersize=18 )
+title = args.dataset + '-' + args.arch + ': p=0.5'
+plt.title(title)
+plt.plot( all_epochs[epoch_50], early_bird_50.get_maskdiff()[epoch_50], 'r*-', markersize=13 )
 plt.savefig(os.path.join(args.save, 'EB50.png'))
 
 plt.figure()
 plt.plot( all_epochs, early_bird_70.get_maskdiff(), 'b-' )
 plt.xlabel('Epochs')
 plt.ylabel('Number of Changes in Pruning Mask')
-plt.plot( all_epochs[epoch_70], early_bird_70.get_maskdiff()[epoch_70], 'r*-', markersize=18 )
+title = args.dataset + '-' + args.arch + ': p=0.7'
+plt.title(title)
+plt.plot( all_epochs[epoch_70], early_bird_70.get_maskdiff()[epoch_70], 'r*-', markersize=13 )
 plt.savefig(os.path.join(args.save, 'EB70.png'))
 
 print("Best accuracy: "+str(best_prec1))

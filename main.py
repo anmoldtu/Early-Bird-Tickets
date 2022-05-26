@@ -310,7 +310,7 @@ def createGraph( X, Y, ebticketpoch, Ylabel, title, filename):
   plt.xlabel('Epochs')
   plt.ylabel(Ylabel)
   plt.title(title)
-  plt.plot( X[ebticketpoch], Y[ebticketpoch], 'ro-', markersize=13 )
+  plt.plot( X[ebticketpoch], Y[ebticketpoch], 'ko-', markersize=10 )
   plt.savefig(os.path.join(args.save, filename))
   
 class EarlyBird():

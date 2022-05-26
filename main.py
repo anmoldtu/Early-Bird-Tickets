@@ -304,6 +304,15 @@ def test():
         test_loss, test_acc, len(test_loader), test_acc / len(test_loader)))
     return np.round(test_acc / len(test_loader), 2)
 
+def createGraph( X, Y, ebticketpoch, Ylabel, title, filename):
+  plt.figure()
+  plt.plot( X, Y, 'b-' )
+  plt.xlabel('Epochs')
+  plt.ylabel(Ylabel)
+  plt.title(title)
+  plt.plot( X[ebticketpoch], Y[ebticketpoch], 'r*-', markersize=13 )
+  plt.savefig(os.path.join(args.save, filename))
+  
 class EarlyBird():
     def __init__(self, percent, epoch_keep=5):
         self.percent = percent
@@ -311,6 +320,7 @@ class EarlyBird():
         self.masks = []
         self.dists = [1 for i in range(1, self.epoch_keep)]
         self.maskdiff = []
+        self.allmasks = []
 
     def pruning(self, model, percent):
         total = 0
@@ -373,6 +383,7 @@ class EarlyBird():
 
     def early_bird_emerge(self, model):
         mask = self.pruning(model, self.percent)
+        self.allmasks.append(mask)
         self.put(mask)
         flag = self.cal_dist()
         if flag == True:
@@ -386,6 +397,9 @@ class EarlyBird():
           
     def get_maskdiff(self):
         return self.maskdiff
+      
+    def get_allmasks(self):
+        return self.allmasks
 
 best_prec1 = 0.
 flag_30 = True
@@ -460,32 +474,40 @@ for epoch in range(args.start_epoch, args.epochs):
 
 all_epochs = [*range(1, args.epochs, 1)]
 
-plt.figure()
-plt.plot( all_epochs, early_bird_30.get_maskdiff(), 'b-' )
-plt.xlabel('Epochs')
-plt.ylabel('Number of Changes in Pruning Mask')
+eb30allmasks = early_bird_30.get_allmasks()
+eb50allmasks = early_bird_50.get_allmasks()
+eb70allmasks = early_bird_70.get_allmasks()
+ebticketdiff_30 = []
+ebticketdiff_50 = []
+ebticketdiff_70 = []
+
+for i in range(0,args.epochs):
+  ebticketdiff_30.append(torch.sum(eb30allmasks[i]!=eb30allmasks[epoch_30]))
+  ebticketdiff_50.append(torch.sum(eb50allmasks[i]!=eb50allmasks[epoch_50]))
+  ebticketdiff_70.append(torch.sum(eb70allmasks[i]!=eb70allmasks[epoch_70]))
+
+  
+# Graphs for changes in EB Ticket wrt all other tickets
 title = args.dataset + '-' + args.arch + ': p=0.3'
-plt.title(title)
-plt.plot( all_epochs[epoch_30], early_bird_30.get_maskdiff()[epoch_30], 'r*-', markersize=13 )
-plt.savefig(os.path.join(args.save, 'EB30.png'))
+createGraph(all_epochs, ebticketdiff_30, epoch_30, 'Number of Changes w.r.t EB Ticket', title, 'EB30_ebchanges.png')
 
-plt.figure()
-plt.plot( all_epochs, early_bird_50.get_maskdiff(), 'b-' )
-plt.xlabel('Epochs')
-plt.ylabel('Number of Changes in Pruning Mask')
 title = args.dataset + '-' + args.arch + ': p=0.5'
-plt.title(title)
-plt.plot( all_epochs[epoch_50], early_bird_50.get_maskdiff()[epoch_50], 'r*-', markersize=13 )
-plt.savefig(os.path.join(args.save, 'EB50.png'))
+createGraph(all_epochs, ebticketdiff_50, epoch_50, 'Number of Changes w.r.t EB Ticket', title, 'EB50_ebchanges.png')
 
-plt.figure()
-plt.plot( all_epochs, early_bird_70.get_maskdiff(), 'b-' )
-plt.xlabel('Epochs')
-plt.ylabel('Number of Changes in Pruning Mask')
 title = args.dataset + '-' + args.arch + ': p=0.7'
-plt.title(title)
-plt.plot( all_epochs[epoch_70], early_bird_70.get_maskdiff()[epoch_70], 'r*-', markersize=13 )
-plt.savefig(os.path.join(args.save, 'EB70.png'))
+createGraph(all_epochs, ebticketdiff_70, epoch_70, 'Number of Changes w.r.t EB Ticket', title, 'EB70_ebchanges.png')
+
+  
+# Graphs for changes in Pruning Mask in each Iteration
+title = args.dataset + '-' + args.arch + ': p=0.3'
+createGraph(all_epochs, early_bird_30.get_maskdiff(), epoch_30, 'Number of Changes in Pruning Mask', title, 'EB30.png')
+
+title = args.dataset + '-' + args.arch + ': p=0.5'
+createGraph(all_epochs, early_bird_50.get_maskdiff(), epoch_50, 'Number of Changes in Pruning Mask', title, 'EB50.png')
+
+title = args.dataset + '-' + args.arch + ': p=0.7'
+createGraph(all_epochs, early_bird_70.get_maskdiff(), epoch_70, 'Number of Changes in Pruning Mask', title, 'EB70.png')
+
 
 print("Best accuracy: "+str(best_prec1))
 history_score[-1][0] = best_prec1

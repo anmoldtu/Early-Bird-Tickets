@@ -472,8 +472,6 @@ for epoch in range(args.start_epoch, args.epochs):
         'optimizer': optimizer.state_dict(),
     }, is_best, epoch, filepath=args.save)
 
-all_epochs = [*range(1, args.epochs, 1)]
-
 eb30allmasks = early_bird_30.get_allmasks()
 eb50allmasks = early_bird_50.get_allmasks()
 eb70allmasks = early_bird_70.get_allmasks()
@@ -487,6 +485,7 @@ for i in range(0,args.epochs):
   ebticketdiff_70.append(torch.sum(eb70allmasks[i]!=eb70allmasks[epoch_70]))
 
   
+all_epochs = [*range(0, args.epochs, 1)]
 # Graphs for changes in EB Ticket wrt all other tickets
 title = args.dataset + '-' + args.arch + ': p=0.3'
 createGraph(all_epochs, ebticketdiff_30, epoch_30, 'Number of Changes w.r.t EB Ticket', title, 'EB30_ebchanges.png')
@@ -497,7 +496,7 @@ createGraph(all_epochs, ebticketdiff_50, epoch_50, 'Number of Changes w.r.t EB T
 title = args.dataset + '-' + args.arch + ': p=0.7'
 createGraph(all_epochs, ebticketdiff_70, epoch_70, 'Number of Changes w.r.t EB Ticket', title, 'EB70_ebchanges.png')
 
-  
+all_epochs = [*range(1, args.epochs, 1)]
 # Graphs for changes in Pruning Mask in each Iteration
 title = args.dataset + '-' + args.arch + ': p=0.3'
 createGraph(all_epochs, early_bird_30.get_maskdiff(), epoch_30, 'Number of Changes in Pruning Mask', title, 'EB30.png')
